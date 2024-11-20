@@ -91,8 +91,8 @@ jobs:
         with:
           aws_access_key: ${{secrets.AWS_ACTION_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}
-          application_name: Project-dev
-          environment_name: Project-dev-env
+          application_name: MODUEGIL
+          environment_name: MODUEGIL-env-1
           region: ap-northeast-2
           deployment_package: dist/deploy.zip
           use_existing_version_if_available: true
