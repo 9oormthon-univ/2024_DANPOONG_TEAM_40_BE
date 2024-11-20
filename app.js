@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('./src/passport');
+const indexRouter = require('./src/routes/index-route');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
@@ -63,7 +64,6 @@ app.set('view engine', 'ejs');
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/', authRouter);
-app.use('/route', routeRouter);
 app.get('/session', (req, res) => {
   console.log('세션 데이터:', req.session);
   res.send(req.session);

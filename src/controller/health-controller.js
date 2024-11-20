@@ -1,3 +1,3 @@
-export const healthController = (req, res, next) => {
-    res.send("HELLO, I'm Healthy!");
-};
+module.exports = (req, res) => {
+    res.send("Health Check OK");
+  };
