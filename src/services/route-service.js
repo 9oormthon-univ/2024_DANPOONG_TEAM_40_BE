@@ -3,6 +3,13 @@ const mongoose = require('mongoose');
 const TransitRoute = require('../models/TransitRoute');
 const Station = require('../models/Station');
 
+/**
+ * 역 이름과 노선 코드로 역 정보를 조회합니다.
+ * @param {string} stationName - 역 이름
+ * @param {string} lineCode - 노선 코드
+ * @returns {Promise<Object>} 역 정보 객체 (lineCode, stationCode, railOperatorCode)
+ * @throws {Error} 역 조회 실패 시 오류
+ */
 exports.findStationByName = async (stationName, lineCode) => {
   try {
     const station = await Station.findOne({
@@ -23,7 +30,13 @@ exports.findStationByName = async (stationName, lineCode) => {
   }
 };
 
-// 역사 내부 경로 제공
+/**
+ * 특정 역의 내부 정보를 제공합니다.
+ * @param {string} startStationName - 시작 역 이름
+ * @param {string} startStatinLineCode - 시작 노선 코드
+ * @returns {Promise<Object[]>} 내부 정보 배열
+ * @throws {Error} 역 내부 정보 조회 실패 시 오류
+ */
 exports.fetchStationInternalDetails = async (
   startStationName,
   startStatinLineCode
@@ -52,7 +65,15 @@ exports.fetchStationInternalDetails = async (
   }
 };
 
-// 환승 경로 api
+/**
+ * 환승 경로 정보를 가져옵니다.
+ * @param {string} startStationName - 시작 역 이름
+ * @param {string} startLineCode - 시작 노선 코드
+ * @param {string} endStationName - 종료 역 이름
+ * @param {string} endLineCode - 종료 노선 코드
+ * @returns {Promise<Object[]>} 환승 경로 정보 배열
+ * @throws {Error} 환승 경로 조회 실패 시 오류
+ */
 exports.fetchStationDetails = async (
   startStationName,
   startLineCode,
@@ -90,6 +111,16 @@ exports.fetchStationDetails = async (
   }
 };
 
+/**
+ * Tmap API를 이용하여 대중교통 경로를 가져옵니다.
+ * @param {Object} coordinate - 출발지 및 목적지 좌표
+ * @param {number} coordinate.startX - 출발지 경도
+ * @param {number} coordinate.startY - 출발지 위도
+ * @param {number} coordinate.endX - 목적지 경도
+ * @param {number} coordinate.endY - 목적지 위도
+ * @returns {Promise<Object[]>} 경로 데이터 배열
+ * @throws {Error} 경로 fetch 실패 시 오류
+ */
 exports.fetchTransitRoute = async (coordinate) => {
   try {
     const response = await axios.post(
@@ -177,6 +208,13 @@ exports.fetchTransitRoute = async (coordinate) => {
   }
 };
 
+/**
+ * 사용자 ID와 경로 데이터를 저장합니다.
+ * @param {string} userId - 사용자 ID
+ * @param {Object[]} routes - 저장할 경로 데이터 배열
+ * @throws {Error} 경로 저장 실패 시 오류
+ */
+
 exports.saveRoutes = async (userId, routes) => {
   try {
     const routeDocs = routes.map((route) => ({
@@ -191,6 +229,14 @@ exports.saveRoutes = async (userId, routes) => {
     throw new Error('경로 저장 실패');
   }
 };
+
+/**
+ * 사용자 ID와 경로 ID로 특정 경로 데이터를 조회합니다.
+ * @param {string} userId - 사용자 ID
+ * @param {string} routeId - 조회할 경로 ID
+ * @returns {Promise<Object|null>} 경로 데이터 객체 (없을 경우 null)
+ * @throws {Error} 경로 조회 실패 시 오류
+ */
 
 exports.getRouteById = async (userId, routeId) => {
   try {

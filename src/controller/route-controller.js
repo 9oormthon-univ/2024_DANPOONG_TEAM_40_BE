@@ -1,6 +1,13 @@
 const { StatusCodes } = require('http-status-codes');
 const routeService = require('../services/route-service');
 
+/**
+ * Tmap API를 이용해 대중교통 경로를 검색하고 저장합니다.
+ * @param {Object} req - Express 요청 객체 (userId와 좌표 포함)
+ * @param {Object} res - Express 응답 객체
+ * @throws {Error} 경로 검색 또는 저장 중 오류 발생 시 처리
+ */
+
 exports.findTransitRoute = async (req, res) => {
   const { userId, startX, startY, endX, endY } = req.body;
 
@@ -29,6 +36,12 @@ exports.findTransitRoute = async (req, res) => {
   }
 };
 
+/**
+ * 저장된 특정 경로 데이터를 기반으로 경로 안내를 제공합니다.
+ * @param {Object} req - Express 요청 객체 (userId와 routeId 포함)
+ * @param {Object} res - Express 응답 객체
+ * @throws {Error} 경로 안내 중 오류 발생 시 처리
+ */
 exports.navigateRoute = async (req, res) => {
   try {
     const { userId, routeId } = req.body;
