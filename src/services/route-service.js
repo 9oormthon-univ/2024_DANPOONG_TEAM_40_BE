@@ -23,6 +23,73 @@ exports.findStationByName = async (stationName, lineCode) => {
   }
 };
 
+// 역사 내부 경로 제공
+exports.fetchStationInternalDetails = async (
+  startStationName,
+  startStatinLineCode
+) => {
+  try {
+    const startStation = await exports.findStationByName(
+      startStationName,
+      startStatinLineCode
+    );
+
+    const response = await axios.get(
+      'https://openapi.kric.go.kr/openapi/handicapped/stationMovement',
+      {
+        params: {
+          serviceKey: process.env.KRIC_API_KEY,
+          format: 'json',
+          lnCd: startStation.lnCd,
+          railOprIsttCd: startStation.railOprIsttCd,
+          stinCd: startStation.stinCd,
+        },
+      }
+    );
+    return response.data || [];
+  } catch (err) {
+    console.error('역 내부 경로 가져오기 실패: ', err.message);
+  }
+};
+
+// 환승 경로 api
+exports.fetchStationDetails = async (
+  startStationName,
+  startLineCode,
+  endStationName,
+  endLineCode
+) => {
+  try {
+    const startStation = await exports.findStationByName(
+      startStationName,
+      startLineCode
+    );
+    const endStation = await exports.findStationByName(
+      endStationName,
+      endLineCode
+    );
+
+    const response = await axios.get(
+      'https://openapi.kric.go.kr/openapi/handicapped/transferMovement',
+      {
+        params: {
+          serviceKey: process.env.KRIC_API_KEY,
+          format: 'json',
+          railOprIsttCd: startStation.railOprIsttCd,
+          chthTgtLn: endLineCode,
+          lnCd: startLineCode,
+          stinCd: startStation.stinCd,
+        },
+      }
+    );
+
+    return response.data || [];
+  } catch (err) {
+    console.error('환승 경로 가져오기 실패: ', err.message);
+    throw new Error('환승 경로 조회 실패');
+  }
+};
+
 exports.fetchTransitRoute = async (coordinate) => {
   try {
     const response = await axios.post(

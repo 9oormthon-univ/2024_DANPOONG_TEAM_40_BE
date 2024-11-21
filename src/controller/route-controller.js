@@ -44,6 +44,38 @@ exports.navigateRoute = async (req, res) => {
         .json({ message: '해당 경로 데이터를 찾을 수 없습니다.' });
     }
 
+    const processedRoute = [];
+    for (let i = 0; i < navigateData.routeDetails.legs.length; i++) {
+      const currentLeg = navigateData.routeDetails.legs[i];
+      const nextLeg = navigateData.routeDetails.legs[i + 1];
+
+      // 1. `subway -> walk -> subway` 환승 정보 추가
+      if (
+        currentLeg.mode === 'SUBWAY' &&
+        nextLeg?.mode === 'WALK' &&
+        navigateData.routeDetails.legs[i + 2]?.mode === 'SUBWAY'
+      ) {
+        const transferInfo = await routeService.fetchStationDetails(
+          currentLeg.end.name,
+          currentLeg.type,
+          navigateData.routeDetails.legs[i + 2].end.name,
+          navigateData.routeDetails.legs[i + 2].type
+        );
+
+        currentLeg.transferInfo = transferInfo?.body || [];
+      }
+
+      // 2. `subway` 시작이나 종료 시 역사 내부 정보 추가
+      if (currentLeg.mode === 'SUBWAY') {
+        const internalInfo = await routeService.fetchStationInternalDetails(
+          currentLeg.start.name,
+          currentLeg.type
+        );
+        currentLeg.internalInfo = internalInfo?.body || [];
+      }
+
+      processedRoute.push(currentLeg);
+    }
     return res
       .status(StatusCodes.OK)
       .json({ message: '경로 안내 시작!', data: navigateData });
