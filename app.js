@@ -11,6 +11,7 @@ require('dotenv').config();
 const authRouter = require('./src/routes/auth-route');
 const routeRouter = require('./src/routes/route-route');
 const placeRouter = require('./src/routes/place-route');
+const reviewRouter = require('./src/routes/review-route');
 const connect = require('./src/models');
 const { healthRoute } = require('./src/routes/health-route');
 const ttsRoute = require('./src/routes/tts-route');
@@ -69,11 +70,11 @@ app.use('/auth', authRouter);
 app.use('/', authRouter);
 app.use('/places', placeRouter);
 app.use('/route', routeRouter);
+app.use('/review', reviewRouter);
 app.get('/session', (req, res) => {
   console.log('세션 데이터:', req.session);
   res.send(req.session);
 });
-
 
 app.use('/health', healthRoute);
 
