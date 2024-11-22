@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "moduegil-442205",
+  "private_key_id": "7a2e021eff5cdebcf5a7aaf2dea11bc479bc39c6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC/BktGWg1avJbH\na1ibQez0QjVzS9hIpT7E8iPmqwk+xCmpaP5ekBU4c4t4nSeszHApfAs6VkiV3FQo\ncEAU6xRwhZf0vwjrjsyxaj8P4ScRxDX71Gs4Vd8xM+vz18uw1iNQDKjdkN+Mf8Vf\nPCkAhtKDniNa/5sEvjHXRXjRllF4UVwlSE0Ot0Q9/bvMDGyh7PmRREGz1oxeP+5c\n7M3IjROowF6Wwq/voxtaxY/BDDl8ZBXdA5TkEfLyDvqhAYdrlxrtw0qPyZKAGzce\nVxVinWYzg7dI0Bc5FNSRvQeBfCW8G0wxplIjp2geN8Uw0prbrRcF9vAFzlc6cTZq\npE1HFAI/AgMBAAECggEADw+A+c/5w5Cg1qIo/zyoYO2jZy6wo7GbjE2G9RXBCdjP\nbBLiEzSK58N8WIsTaLVJlou4GuZYnLAdVn7bHosWNnTh8SLqoh/FFavJwwe+W9E7\nbFpoBa4HhcqRLM1zusJ3UEVfPvDAH0SnnAWTOf5nNIdQRElowGv6Y/2PM/8E91ZX\nwGCuOYTDTx1RUPmubZY9J1W7t5sYmNaWdD5/DWnoUxVxJJ1w+T93H3RWOwXDdCZp\nabzn/sZYH4E2+ZLyV8PeIDpHG4UOH0NoyeIEGQ9kiIEF+vOnSGIqhVs4L5CQVdpq\n8nzHUIWAoDOUfwL0Rcn1ZZialc9WGaIem4JelkbSmQKBgQD0lcU2mOQ1dHGsOBR1\nen9r1RvVAV63txoCC+r1rwYTwEe6L5aQ5a0If7HFcuDSPQsdikqYPzNMixAQSN41\n304xZapqgGUsM4s1dexeJndF04k4i9fTr/keo8oKLI3WVX2WEl4IXw/DyLSKkHM5\ndqSJD8+pCNw0d8PIN4ECjtUpNQKBgQDH8JlnHCX0lX5dctKv/mvIaujOVXsj4QH9\nBYC29VyAudxdjPJF2SMw4lZxs2QChr+y5yTo13zzs0dTo2ankp29LxgQ30aXVUGS\n6O8zV4Xq3wjKJa1KUkn9mHJxRzgjL5Vl0GuGTBuGIEp3F4Gm0fjKOwVtz52qaqyg\nNZEUSX3gIwKBgBJKZP4pPt+0fo+3fegvKfpBbJxoRtIMUliW1ZJb7WNqvLJyvprF\nYkRBcGToq2FtiThDUELEbyypNaFSIbP7qBhPlwfx5B8DF8T+tZdw3viM0jU1WAWP\nolylOQW7wTunFwYzB28u1Ln6d23pUYSZl8JcOVZVwEn4Lt75L5+mWNCFAoGBAJof\nfrD8AsoaXvF8LKrb7Yvt1Y4QWL8cmOLJViIy216jZxp6Jtvu+PCa2NYG2eYUpzsq\ncMpIKhrVrPrtL5mnLI8D+YIwCwNnBghQJOun4SRfTzA8gOuUqVKiLD3kD4MYEAsO\n8YPxsRngVGafKSNGIokJnDK84yXV20IYaMCBslWPAoGBAOZZVOuPRBE52Y7xmkDs\nfZb28OQjTkPY9UMWWnUuNshzmEo8p1G/yFhfliDvEg1AVLrsl1edsOQAGqA/AIGw\nkZmdvMpRwdaU0Fgr5lCbRsWa43vmzKFVT5leGOOKwhXyFvComHOzaAh6SiJ52YMg\nassDcJY4ppiFFTFGSFcbmsst\n-----END PRIVATE KEY-----\n",
+  "client_email": "moduegil@moduegil-442205.iam.gserviceaccount.com",
+  "client_id": "117166267994579499132",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/moduegil%40moduegil-442205.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

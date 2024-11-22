@@ -11,6 +11,7 @@ require('dotenv').config();
 const authRouter = require('./src/routes/auth-route');
 const connect = require('./src/models');
 const { healthRoute } = require('./src/routes/health-route');
+const ttsRoute = require('./src/routes/tts-route');
 const app = express();
 
 // 데이터베이스 연결
@@ -68,6 +69,8 @@ app.get('/session', (req, res) => {
   console.log('세션 데이터:', req.session);
   res.send(req.session);
 });
+
+app.use('/tts', ttsRoute);
 
 
 app.use('/health', healthRoute);
