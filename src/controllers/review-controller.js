@@ -1,6 +1,16 @@
 const { StatusCodes } = require('http-status-codes');
 const reviewService = require('../services/review-service');
 
+/**
+ * 새로운 리뷰를 등록합니다.
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} req.params - 요청 경로 파라미터 (id: 장소 ID)
+ * @param {Object} req.body - 요청 바디 (wheelchairAccess, service, taste, reviewText 포함)
+ * @param {Object} req.files - 업로드된 이미지 파일 목록
+ * @param {Object} res - Express 응답 객체
+ * @returns {Promise<void>} 성공 또는 에러 응답 반환
+ * @throws {Error} 필수 데이터 누락, 서버 오류 발생 시 처리
+ */
 exports.postReview = async (req, res) => {
   try {
     const placeId = req.params.id;
@@ -56,6 +66,14 @@ exports.postReview = async (req, res) => {
   }
 };
 
+/**
+ * 특정 장소의 리뷰를 조회합니다.
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} req.params - 요청 경로 파라미터 (id: 장소 ID)
+ * @param {Object} res - Express 응답 객체
+ * @returns {Promise<void>} 성공 또는 에러 응답 반환
+ * @throws {Error} 필수 데이터 누락, 서버 오류 발생 시 처리
+ */
 exports.getReview = async (req, res) => {
   try {
     const placeId = req.params.id;
