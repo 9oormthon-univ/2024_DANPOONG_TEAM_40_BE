@@ -1,6 +1,14 @@
 const { StatusCodes } = require('http-status-codes');
 const placeService = require('../services/place-service');
 
+/**
+ * 키워드와 현재 위치를 기반으로 장소를 검색합니다.
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} req.query - 쿼리 파라미터 (keyword, page, count)
+ * @param {Object} req.body - 요청 바디 (userLat, userLon)
+ * @param {Object} res - Express 응답 객체
+ * @throws {Error} 잘못된 요청 또는 서버 오류 발생 시 처리
+ */
 exports.searchPlace = async (req, res) => {
   const { keyword, page, count } = req.query;
   const { userLat, userLon } = req.body;
@@ -43,6 +51,15 @@ exports.searchPlace = async (req, res) => {
   }
 };
 
+/**
+ * 특정 장소의 ID를 기반으로 상세 정보를 조회하고, 검색 기록을 저장합니다.
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} req.params - 경로 파라미터 (pid)
+ * @param {Object} req.user - 사용자 정보 객체 (userId 포함)
+ * @param {Object} req.session - 비회원 세션 객체
+ * @param {Object} res - Express 응답 객체
+ * @throws {Error} 장소 상세 조회 실패 시 처리
+ */
 exports.searchSpecifiedPlace = async (req, res) => {
   try {
     const pid = req.params.pid;
