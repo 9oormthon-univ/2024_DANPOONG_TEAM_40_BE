@@ -103,7 +103,15 @@ exports.getSpecifiedPlace = async (pid) => {
     );
 
     const poiInfo = response.data.poiDetailInfo || [];
-    console.log(response.data);
+
+    // [영업시간] 제거 및 세미콜론 제거 처리
+    let processedTime = null;
+    if (poiInfo.additionalInfo) {
+      processedTime = poiInfo.additionalInfo
+        .replace(/\[영업시간\]/g, '') // [영업시간] 제거
+        .replace(/;/g, ' ');
+    }
+
     return {
       id: poiInfo.id,
       name: poiInfo.name,
@@ -113,7 +121,7 @@ exports.getSpecifiedPlace = async (pid) => {
       point: poiInfo.point,
       lat: poiInfo.lat,
       lon: poiInfo.lon,
-      time: poiInfo.additionalInfo,
+      time: processedTime,
     };
   } catch (err) {
     console.error('장소 상세 검색 중 서버 오류', err);
