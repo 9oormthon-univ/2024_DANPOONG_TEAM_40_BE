@@ -13,6 +13,8 @@ const routeRouter = require('./src/routes/route-route');
 const placeRouter = require('./src/routes/place-route');
 const reviewRouter = require('./src/routes/review-route');
 const recommendRouter = require('./src/routes/recommend-route');
+const aroundRouter = require('./src/routes/around-route');
+const listRouter = require('./src/routes/list-route');
 const connect = require('./src/models');
 const { healthRoute } = require('./src/routes/health-route');
 const ttsRoute = require('./src/routes/tts-route');
@@ -73,6 +75,8 @@ app.use('/places', placeRouter);
 app.use('/route', routeRouter);
 app.use('/review', reviewRouter);
 app.use('/recommend', recommendRouter);
+app.use('/around', aroundRouter);
+app.use('/list', listRouter);
 app.get('/session', (req, res) => {
   console.log('세션 데이터:', req.session);
   res.send(req.session);
