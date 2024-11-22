@@ -136,3 +136,40 @@ exports.searchSpecifiedPlace = async (req, res) => {
       .json({ message: '장소 검색 중 에러 발생' });
   }
 };
+
+/**
+ * 사용자가 입력한 키워드로 장소 정보를 검색합니다.
+ * @param {Object} req - Express 요청 객체
+ * @param {Object} req.query - 요청 쿼리 파라미터 (keyword 포함)
+ * @param {Object} res - Express 응답 객체
+ * @returns {Promise<void>} 장소 정보 검색 결과를 JSON으로 반환
+ * @throws {Error} 잘못된 요청, 검색 실패, 또는 서버 오류 시 처리
+ */
+exports.getPlaceInfo = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    if (!keyword) {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: '찾고자 하는 장소의 정보가 없습니다.' });
+    }
+
+    const placeInfo = await placeService.searchPlaceInfo(keyword);
+
+    if (!placeInfo) {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json('찾고자 하는 장소의 정보가 없습니다.');
+    }
+
+    return res.status(StatusCodes.OK).json({
+      message: '장소 정보 검색 성공',
+      data: placeInfo,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: '장소 정보 검색 중 서버 오류' });
+  }
+};
