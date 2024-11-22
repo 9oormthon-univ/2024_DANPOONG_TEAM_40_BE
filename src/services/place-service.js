@@ -103,7 +103,7 @@ exports.getSpecifiedPlace = async (pid) => {
     );
 
     const poiInfo = response.data.poiDetailInfo || [];
-    console.log(poiInfo);
+    console.log(response.data);
     return {
       id: poiInfo.id,
       name: poiInfo.name,
@@ -111,9 +111,9 @@ exports.getSpecifiedPlace = async (pid) => {
       desc: poiInfo.desc,
       address: poiInfo.address,
       point: poiInfo.point,
-      useTime: poiInfo.useTime,
       lat: poiInfo.lat,
       lon: poiInfo.lon,
+      time: poiInfo.additionalInfo,
     };
   } catch (err) {
     console.error('장소 상세 검색 중 서버 오류', err);

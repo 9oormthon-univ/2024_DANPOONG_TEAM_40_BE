@@ -63,7 +63,7 @@ exports.searchPlace = async (req, res) => {
 exports.searchSpecifiedPlace = async (req, res) => {
   try {
     const pid = req.params.pid;
-    const userId = req.user.userId;
+    const userId = req.user?.userId || 1;
     if (!pid) {
       return res
         .status(StatusCodes.BAD_REQUEST)
