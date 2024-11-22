@@ -166,3 +166,61 @@ exports.findSearchLog = async (userId, placeId) => {
     'searchData.placeId': placeId,
   });
 };
+
+/**
+ * 카카오 API를 사용해 키워드로 장소 관련 정보를 검색합니다.
+ * @param {string} keyword - 검색 키워드
+ * @returns {Promise<Object[]>} 검색된 결과 배열 (web, image, vclip 등 타입별 데이터 포함)
+ * @throws {Error} API 요청 실패 또는 처리 중 오류 발생 시 처리
+ */
+exports.searchPlaceInfo = async (keyword) => {
+  try {
+    // 공통 API 요청 설정
+    const config = {
+      headers: {
+        Authorization: `KakaoAK ${process.env.KAKAO_API_KEY}`,
+      },
+    };
+
+    // 병렬 호출 설정 (각각의 요청에 size: 5 추가)
+    const requests = [
+      {
+        type: 'web',
+        url: 'https://dapi.kakao.com/v2/search/web',
+        params: { query: keyword, size: 5 },
+      },
+      {
+        type: 'image',
+        url: 'https://dapi.kakao.com/v2/search/image',
+        params: { query: keyword, size: 5 },
+      },
+      {
+        type: 'vclip',
+        url: 'https://dapi.kakao.com/v2/search/vclip',
+        params: { query: keyword, size: 5 },
+      },
+    ];
+
+    // Promise.all을 사용해 병렬 요청
+    const responses = await Promise.all(
+      requests.map((req) =>
+        axios
+          .get(req.url, { ...config, params: req.params })
+          .then((response) => ({
+            type: req.type, // 요청 타입 (web, image, vclip 등)
+            data: response.data.documents || [], // API 응답 데이터
+          }))
+          .catch((error) => ({
+            type: req.type,
+            error: error.message, // 에러 메시지 포함
+          }))
+      )
+    );
+
+    // 결과 반환
+    return responses;
+  } catch (err) {
+    console.error('검색 API 요청 중 에러: ', err.message);
+    throw new Error('검색 API 요청 중 에러 발생');
+  }
+};
