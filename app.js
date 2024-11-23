@@ -84,6 +84,9 @@ app.get('/session', (req, res) => {
 
 app.use('/health', healthRoute);
 
+app.use('/tts', ttsRoute);
+console.log('GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+
 // 기본 상태 코드 및 응답 메시지
 const HTTP_STATUS = {
   SUCCESS: 200,
