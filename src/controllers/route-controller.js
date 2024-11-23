@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const routeService = require('../services/route-service');
+const ttsService = require('../services/tts-service');
 
 /**
  * Tmap API를 이용해 대중교통 경로를 검색하고 저장합니다.
@@ -117,6 +118,7 @@ exports.navigateRoute2 = async (req, res) => {
     }
 
     const descriptions = []; // 전체 설명 리스트 (순서 보존)
+    const ttsFiles = []; // 생성된 TTS 파일 경로 리스트
 
     for (let i = 0; i < navigateData.routeDetails.legs.length; i++) {
       const currentLeg = navigateData.routeDetails.legs[i];
@@ -166,7 +168,6 @@ exports.navigateRoute2 = async (req, res) => {
       }
 
       // 3. 역 내부 정보 추가 조건
-      // 3.1. 역으로 들어가는 경우 (walk -> subway)
       if (currentLeg.mode === 'SUBWAY' && prevLeg?.mode === 'WALK') {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.start.name,
@@ -187,7 +188,6 @@ exports.navigateRoute2 = async (req, res) => {
         }
       }
 
-      // 3.2. 역에서 나가는 경우 (subway -> walk)
       if (currentLeg.mode === 'SUBWAY' && nextLeg?.mode === 'WALK') {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.end.name,
@@ -209,11 +209,18 @@ exports.navigateRoute2 = async (req, res) => {
       }
     }
 
+    // TTS 생성
+    for (const desc of descriptions) {
+      const ttsPath = await ttsService.generateSpeech(desc.description);
+      ttsFiles.push(ttsPath); // TTS 파일 경로 저장
+    }
+
     return res.status(StatusCodes.OK).json({
       message: '경로 안내 시작!',
       data: {
         ...navigateData,
         descriptions,
+        ttsFiles, // TTS 파일 경로 포함
       },
     });
   } catch (err) {
