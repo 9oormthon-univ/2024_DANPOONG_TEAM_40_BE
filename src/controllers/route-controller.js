@@ -167,7 +167,6 @@ exports.navigateRoute2 = async (req, res) => {
       }
 
       // 3. 역 내부 정보 추가 조건
-      // 3.1. 역으로 들어가는 경우 (walk -> subway)
       if (currentLeg.mode === 'SUBWAY' && prevLeg?.mode === 'WALK') {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.start.name,
@@ -188,7 +187,6 @@ exports.navigateRoute2 = async (req, res) => {
         }
       }
 
-      // 3.2. 역에서 나가는 경우 (subway -> walk)
       if (currentLeg.mode === 'SUBWAY' && nextLeg?.mode === 'WALK') {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.end.name,
@@ -227,6 +225,7 @@ exports.navigateRoute2 = async (req, res) => {
       data: {
         ...navigateData,
         descriptions,
+        ttsFiles, // TTS 파일 경로 포함
       },
     });
   } catch (err) {

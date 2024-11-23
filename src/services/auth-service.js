@@ -1,5 +1,4 @@
 const User = require('../models/User'); // 사용자 모델
-const { v4: uuidv4 } = require('uuid');
 
 exports.processKakaoProfile = async (profile, accessToken, refreshToken) => {
   // 기존에 사용자가 존재하는지 확인
@@ -8,13 +7,9 @@ exports.processKakaoProfile = async (profile, accessToken, refreshToken) => {
   if (!user) {
     // 신규 사용자 생성
     user = new User({
-      userId: uuidv4(),
       kakaoId: profile.id,
       displayName: profile.displayName,
-      profileImage:
-        profile._json &&
-        profile._json.properties &&
-        profile._json.properties.profile_image,
+      profileImage: profile._json && profile._json.properties && profile._json.properties.profile_image,
     });
     await user.save();
     console.log('New user created:', user);

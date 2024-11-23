@@ -34,9 +34,14 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('combined'));
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "https:"],
+        },
+      },
       crossOriginEmbedderPolicy: false,
-      crossOriginResourcePolicy: false,
     })
   );
 } else {
@@ -46,7 +51,7 @@ if (process.env.NODE_ENV === 'production') {
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || '*', // 허용된 도메인 설정
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
@@ -54,6 +59,8 @@ app.use(
 
 // 정적 파일 서빙
 app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/audio', express.static('outputs'));
 
 // JSON 및 URL 인코딩된 데이터 파싱
 app.use(express.json());
@@ -64,8 +71,8 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'secret-key',
     resave: false,
-    saveUninitialized: false, // 기본값 변경
-    cookie: { secure: process.env.NODE_ENV === 'production' }, // 프로덕션 환경에서만 secure
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 },
   })
 );
 
@@ -76,7 +83,7 @@ app.use(passport.session());
 // 뷰 엔진 설정
 app.set('view engine', 'ejs');
 
-// 라우터 설정 (구체적인 경로를 먼저 등록)
+// 라우터 설정
 app.use('/auth', authRouter);
 app.use('/places', placeRouter);
 app.use('/route', routeRouter);
@@ -86,7 +93,13 @@ app.use('/around', aroundRouter);
 app.use('/list', listRouter);
 app.use('/', indexRouter);
 
-// 디버깅용 세션 확인 엔드포인트 (개발 중에만 사용)
+// 에러 핸들링 미들웨어
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: '서버 에러 발생!' });
+});
+
+// 디버깅용 세션 확인 엔드포인트
 if (process.env.NODE_ENV !== 'production') {
   app.get('/session', (req, res) => {
     console.log('세션 데이터:', req.session);
