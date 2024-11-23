@@ -10,28 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # GitHub Actions 환경 설정
+      # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # SSH 키 추가
+      # 2. SSH 에이전트 설정
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Node.js 설치
+      # 3. 서버 호스트 키 등록
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H 13.209.156.54 >> ~/.ssh/known_hosts
+
+      # 4. SSH 연결 디버깅
+      - name: Debug SSH Connection
+        run: ssh -v ubuntu@13.209.156.54 echo "SSH connection successful"
+
+      # 5. Node.js 환경 설정
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # PM2 배포 실행
+      # 6. PM2 배포 실행
       - name: Deploy with PM2
         run: |
           npm install pm2 -g
           pm2 deploy ecosystem.config.js production
-
-
-      - name: Debug SSH Connection
-        run: ssh -v ubuntu@13.209.156.54 echo "SSH connection successful"
