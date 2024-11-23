@@ -10,9 +10,10 @@ const placeService = require('../services/place-service');
  * @throws {Error} 잘못된 요청 또는 서버 오류 발생 시 처리
  */
 exports.searchPlace = async (req, res) => {
-  const { keyword, page, count } = req.query;
-  const { userLat, userLon } = req.body;
+  // 쿼리 파라미터에서 데이터 가져오기
+  const { keyword, page = 1, count = 5, userLat, userLon } = req.query;
 
+  // 요청 데이터 검증
   if (!keyword) {
     return res
       .status(StatusCodes.BAD_REQUEST)
@@ -20,9 +21,9 @@ exports.searchPlace = async (req, res) => {
   }
 
   if (!userLat || !userLon) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: '현재 위치가 파악되지 않습니다.',
-    });
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: '현재 위치(userLat, userLon)가 필요합니다.' });
   }
 
   if (page <= 0 || count <= 0) {
@@ -32,20 +33,22 @@ exports.searchPlace = async (req, res) => {
   }
 
   try {
+    // Tmap API를 호출하여 장소 데이터 가져오기
     const places = await placeService.searchPlace(
-      userLat,
-      userLon,
+      parseFloat(userLat), // 문자열을 숫자로 변환
+      parseFloat(userLon),
       keyword,
-      page,
-      count
+      parseInt(page, 10),
+      parseInt(count, 10)
     );
+
     return res.status(StatusCodes.OK).json({
       message: '장소 검색 성공',
       data: places,
     });
   } catch (err) {
-    console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    console.error('장소 검색 중 오류:', err.message);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: '장소 검색 중 서버 오류 발생',
     });
   }
