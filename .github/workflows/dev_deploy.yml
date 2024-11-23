@@ -31,3 +31,7 @@ jobs:
         run: |
           npm install pm2 -g
           pm2 deploy ecosystem.config.js production
+
+
+      - name: Debug SSH Connection
+        run: ssh -v ubuntu@13.209.156.54 echo "SSH connection successful"
