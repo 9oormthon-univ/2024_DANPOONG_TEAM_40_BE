@@ -224,8 +224,7 @@ exports.navigateRoute2 = async (req, res) => {
       message: '경로 안내 시작!',
       data: {
         ...navigateData,
-        descriptions,
-        ttsFiles, // TTS 파일 경로 포함
+        descriptions, // TTS 파일 경로 포함
       },
     });
   } catch (err) {

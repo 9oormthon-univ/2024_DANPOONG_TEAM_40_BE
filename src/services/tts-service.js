@@ -1,38 +1,28 @@
+require('dotenv').config(); // 환경 변수 로드
+
 const textToSpeech = require('@google-cloud/text-to-speech');
 const fs = require('fs');
-const path = require('path');
 const util = require('util');
+const path = require('path');
 
-// Google TTS 클라이언트 생성
-const client = new textToSpeech.TextToSpeechClient();
-
-// Ensure the outputs directory exists
-const ensureOutputDirectory = () => {
-  const outputDir = path.join(__dirname, '../outputs'); // 프로젝트 기준 outputs 디렉토리
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true }); // 폴더가 없으면 생성
-    console.log(`Created directory: ${outputDir}`);
-  }
-  return outputDir;
-};
+// Google TTS 클라이언트 초기화
+const client = new textToSpeech.TextToSpeechClient({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // 환경 변수에서 경로 가져오기
+});
 
 /**
- * Text를 음성 파일로 변환합니다.
+ * 텍스트를 음성 파일로 변환합니다.
  * @param {string} text - 변환할 텍스트
  * @returns {Promise<string>} 생성된 음성 파일 경로
  */
-exports.generateSpeech = async (text) => {
+exports.generateAudio = async (text) => {
   try {
-    // Ensure the outputs folder exists
-    const outputDir = ensureOutputDirectory();
-
     const request = {
       input: { text },
       voice: { languageCode: 'ko-KR', ssmlGender: 'FEMALE' },
       audioConfig: { audioEncoding: 'MP3' },
     };
 
-    // Google TTS API 호출
     const [response] = await client.synthesizeSpeech(request);
     const filePath = path.join(
       __dirname,
@@ -45,10 +35,9 @@ exports.generateSpeech = async (text) => {
       'binary'
     );
 
-    console.log(`TTS 음성 파일 생성: ${outputFilePath}`);
-    return outputFilePath;
-  } catch (error) {
-    console.error('TTS 생성 오류:', error);
-    throw new Error('TTS 생성에 실패했습니다.');
+    return filePath;
+  } catch (err) {
+    console.error('TTS 생성 실패:', err.message);
+    throw new Error('TTS 음성 생성 실패');
   }
 };
