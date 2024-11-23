@@ -23,11 +23,11 @@ jobs:
       # 3. 서버 호스트 키 등록
       - name: Add server to known_hosts
         run: |
-          ssh-keyscan -H 13.209.156.54 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 3.37.95.121>> ~/.ssh/known_hosts
 
       # 4. SSH 연결 디버깅
       - name: Debug SSH Connection
-        run: ssh -v ubuntu@13.209.156.54 echo "SSH connection successful"
+        run: ssh -v ubuntu@3.37.95.121 echo "SSH connection successful"
 
       # 5. Node.js 환경 설정
       - name: Setup Node.js
