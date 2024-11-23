@@ -68,7 +68,7 @@ const monthlyMessages = {
 
 exports.getMonthlyRecommend = async (req, res) => {
   try {
-    const { month } = req.body;
+    const { month } = req.params;
     if (!month) {
       res
         .status(StatusCodes.BAD_REQUEST)
