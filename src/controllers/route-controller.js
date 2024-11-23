@@ -108,6 +108,7 @@ exports.navigateRoute2 = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: 'userId와 routeId가 누락되었습니다.' });
     }
+
     const navigateData = await routeService.getRouteById(userId, routeId);
     if (!navigateData) {
       return res
@@ -115,14 +116,27 @@ exports.navigateRoute2 = async (req, res) => {
         .json({ message: '해당 경로 데이터를 찾을 수 없습니다.' });
     }
 
-    const processedRoute = [];
-    const allDescriptions = []; // 전체 경로 설명 리스트
+    const descriptions = []; // 전체 설명 리스트 (순서 보존)
 
     for (let i = 0; i < navigateData.routeDetails.legs.length; i++) {
       const currentLeg = navigateData.routeDetails.legs[i];
       const nextLeg = navigateData.routeDetails.legs[i + 1];
+      const prevLeg = navigateData.routeDetails.legs[i - 1];
 
-      // 환승 정보 추가 (subway -> walk -> subway)
+      // 1. Tmap API를 활용한 일반 이동 정보 추가
+      if (currentLeg.mode === 'SUBWAY') {
+        descriptions.push({
+          type: 'general',
+          description: `${currentLeg.start.name}에서 ${currentLeg.end.name}역까지 지하철(${currentLeg.route}) 이동`,
+        });
+      } else if (currentLeg.mode === 'WALK') {
+        descriptions.push({
+          type: 'general',
+          description: `${currentLeg.start.name}에서 ${currentLeg.end.name}까지 도보 이동 (${currentLeg.distance})`,
+        });
+      }
+
+      // 2. 환승 정보 추가 (subway -> walk -> subway)
       if (
         currentLeg.mode === 'SUBWAY' &&
         nextLeg?.mode === 'WALK' &&
@@ -135,40 +149,72 @@ exports.navigateRoute2 = async (req, res) => {
           navigateData.routeDetails.legs[i + 2].type
         );
 
-        currentLeg.transferInfo = transferInfo?.body || [];
-
-        // 환승 정보 추가
-        transferInfo?.body.forEach((transferStep) =>
-          allDescriptions.push(transferStep.mvContDtl)
-        );
+        if (transferInfo?.body?.length > 0) {
+          const filteredTransferInfo = transferInfo.body.filter(
+            (item) => item.mvPathMgNo === 1
+          );
+          if (filteredTransferInfo.length > 0) {
+            filteredTransferInfo.forEach((info) => {
+              descriptions.push({
+                type: 'transfer',
+                description: info.mvContDtl,
+              });
+            });
+            continue; // 환승 정보가 있으면 내부 정보는 추가하지 않음
+          }
+        }
       }
 
-      // 역사 내부 정보 추가 (subway 시작/종료 시)
-      if (currentLeg.mode === 'SUBWAY') {
+      // 3. 역 내부 정보 추가 조건
+      // 3.1. 역으로 들어가는 경우 (walk -> subway)
+      if (currentLeg.mode === 'SUBWAY' && prevLeg?.mode === 'WALK') {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.start.name,
           currentLeg.type
         );
-        currentLeg.internalInfo = internalInfo?.body || [];
-
-        // 역사 정보 추가
-        internalInfo?.body.forEach((internalStep) =>
-          allDescriptions.push(internalStep.mvContDtl)
-        );
+        if (internalInfo?.body?.length > 0) {
+          const filteredInternalInfo = internalInfo.body.filter(
+            (item) => item.mvPathMgNo === 1
+          );
+          if (filteredInternalInfo.length > 0) {
+            filteredInternalInfo.forEach((info) => {
+              descriptions.push({
+                type: 'internal',
+                description: info.mvContDtl,
+              });
+            });
+          }
+        }
       }
 
-      // Leg의 설명 추가
-      currentLeg.description?.forEach((descStep) =>
-        allDescriptions.push(descStep.description)
-      );
-
-      processedRoute.push(currentLeg);
+      // 3.2. 역에서 나가는 경우 (subway -> walk)
+      if (currentLeg.mode === 'SUBWAY' && nextLeg?.mode === 'WALK') {
+        const internalInfo = await routeService.fetchStationInternalDetails(
+          currentLeg.end.name,
+          currentLeg.type
+        );
+        if (internalInfo?.body?.length > 0) {
+          const filteredInternalInfo = internalInfo.body.filter(
+            (item) => item.mvPathMgNo === 1
+          );
+          if (filteredInternalInfo.length > 0) {
+            filteredInternalInfo.forEach((info) => {
+              descriptions.push({
+                type: 'internal',
+                description: info.mvContDtl,
+              });
+            });
+          }
+        }
+      }
     }
 
     return res.status(StatusCodes.OK).json({
       message: '경로 안내 시작!',
-      data: navigateData,
-      descriptions: allDescriptions, // 전체 설명 리스트 반환
+      data: {
+        ...navigateData,
+        descriptions,
+      },
     });
   } catch (err) {
     console.error(err);
