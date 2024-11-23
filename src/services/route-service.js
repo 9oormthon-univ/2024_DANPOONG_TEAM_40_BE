@@ -89,6 +89,14 @@ exports.fetchStationDetails = async (
       endStationName,
       endLineCode
     );
+    console.log(
+      startStationName,
+      startLineCode,
+      endStationName,
+      endLineCode,
+      startStation.railOprIsttCd,
+      startStation.stinCd
+    );
 
     const response = await axios.get(
       'https://openapi.kric.go.kr/openapi/handicapped/transferMovement',
@@ -251,26 +259,3 @@ exports.getRouteById = async (userId, routeId) => {
     throw new Error('Route 데이터 조회 실패');
   }
 };
-
-/**
- * 경로 데이터를 기반으로 텍스트 설명을 생성합니다.
- * @param {Object[]} routeData - 경로 데이터 배열
- * @returns {string} 경로 설명 텍스트
- */
-exports.createRouteDescription = (routeData) => {
-  const routeDescriptions = routeData.map((route) => {
-    const legsDescription = route.legs.map((leg) => {
-      const mode = leg.mode === "SUBWAY" ? "지하철" :
-                   leg.mode === "BUS" ? "버스" : "도보";
-      const start = leg.start.name || "출발지";
-      const end = leg.end.name || "도착지";
-      return `${start}에서 ${end}까지 ${mode}로 이동합니다. 거리: ${leg.distance}, 소요 시간: ${leg.sectionTime}.`;
-    });
-
-    return `총 소요 시간: ${route.totalTime}, 이동 거리: ${route.totalDistance}, 요금: ${route.totalFare}. 이동 경로: ${legsDescription.join(' ')}`;
-  });
-
-  return routeDescriptions.join('\n\n');
-};
-
-

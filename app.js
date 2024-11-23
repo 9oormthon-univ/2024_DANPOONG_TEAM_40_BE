@@ -1,32 +1,34 @@
 const express = require('express');
-const passport = require('./src/passport');
-const indexRouter = require('./src/routes/index-route');
 const path = require('path');
 const session = require('express-session');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const multer = require('multer');
 require('dotenv').config();
+
+const passport = require('./src/passport');
+const connect = require('./src/models');
+
+// 라우터들
 const authRouter = require('./src/routes/auth-route');
+const indexRouter = require('./src/routes/index-route');
 const routeRouter = require('./src/routes/route-route');
 const placeRouter = require('./src/routes/place-route');
 const reviewRouter = require('./src/routes/review-route');
 const recommendRouter = require('./src/routes/recommend-route');
 const aroundRouter = require('./src/routes/around-route');
 const listRouter = require('./src/routes/list-route');
-const connect = require('./src/models');
-const { healthRoute } = require('./src/routes/health-route');
-const ttsRoute = require('./src/routes/tts-route');
+
 const app = express();
 
 // 데이터베이스 연결
 connect();
 
 // 포트 설정
-app.set('port', process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
+app.set('port', PORT);
 
-// 보안 설정 및 로깅
+// 보안 및 로깅 설정
 if (process.env.NODE_ENV === 'production') {
   app.enable('trust proxy');
   app.use(morgan('combined'));
@@ -42,21 +44,28 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CORS 설정
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN || '*', // 허용된 도메인 설정
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 
 // 정적 파일 서빙
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // JSON 및 URL 인코딩된 데이터 파싱
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // 중복 제거 및 `extended: true` 유지
+app.use(express.urlencoded({ extended: true }));
 
 // 세션 설정
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'secret-key', // 오타 수정
+    secret: process.env.SESSION_SECRET || 'secret-key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // 기본값 변경
+    cookie: { secure: process.env.NODE_ENV === 'production' }, // 프로덕션 환경에서만 secure
   })
 );
 
@@ -67,58 +76,25 @@ app.use(passport.session());
 // 뷰 엔진 설정
 app.set('view engine', 'ejs');
 
-// 라우터 설정
-app.use('/', indexRouter);
+// 라우터 설정 (구체적인 경로를 먼저 등록)
 app.use('/auth', authRouter);
-app.use('/', authRouter);
 app.use('/places', placeRouter);
 app.use('/route', routeRouter);
 app.use('/review', reviewRouter);
 app.use('/recommend', recommendRouter);
 app.use('/around', aroundRouter);
 app.use('/list', listRouter);
-app.get('/session', (req, res) => {
-  console.log('세션 데이터:', req.session);
-  res.send(req.session);
-});
+app.use('/', indexRouter);
 
-app.use('/health', healthRoute);
-
-app.use('/tts', ttsRoute);
-console.log('GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-// 기본 상태 코드 및 응답 메시지
-const HTTP_STATUS = {
-  SUCCESS: 200,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-};
-
-app.get('/', (req, res) => {
-  res.status(HTTP_STATUS.SUCCESS).json({
-    status: 'success',
-    message: '루트 페이지!',
+// 디버깅용 세션 확인 엔드포인트 (개발 중에만 사용)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/session', (req, res) => {
+    console.log('세션 데이터:', req.session);
+    res.send(req.session);
   });
-});
-
-// 404 에러 핸들링
-app.use((req, res, next) => {
-  res.status(HTTP_STATUS.NOT_FOUND).json({
-    status: 'error',
-    message: '페이지를 찾을 수 없습니다.',
-  });
-});
-
-// 글로벌 에러 핸들러
-app.use((err, req, res, next) => {
-  console.error(err.stack); // 에러 로그 출력
-  res.status(err.status || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-    status: 'error',
-    message: err.message || '서버 에러가 발생했습니다.',
-  });
-});
+}
 
 // 서버 시작
-app.listen(app.get('port'), () => {
-  console.log(`Server started on http://localhost:${app.get('port')}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
