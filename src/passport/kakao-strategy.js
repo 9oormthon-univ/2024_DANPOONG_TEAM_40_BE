@@ -1,8 +1,7 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
-const { v4: uuidv4 } = require('uuid');
-const authService = require('../services/auth-service'); // 서비스 추가
-const User = require('../models/User');
+const { v4: uuidv4 } = require('uuid'); // 유니크한 userId 생성
+const User = require('../models/User'); // User 모델
 require('dotenv').config();
 
 passport.use(
@@ -13,29 +12,27 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // 기존 가입된 사용자인지 확인
+        // 데이터베이스에서 사용자 검색
         let user = await User.findOne({ kakaoId: profile.id });
 
         if (!user) {
-          // 신규 사용자 생성 및 자동 회원가입 처리
+          // 신규 사용자 생성
           user = new User({
             userId: uuidv4(),
             kakaoId: profile.id,
             displayName: profile.displayName,
-            profileImage:
-              profile._json &&
-              profile._json.properties &&
-              profile._json.properties.profile_image,
+            profileImage: profile._json?.properties?.profile_image || null,
           });
-          await user.save(); // 새 사용자 저장
+          await user.save();
           console.log('New user registered:', user);
         } else {
           console.log('Existing user logged in:', user);
         }
 
-        // 사용자를 로그인 처리
+        // 사용자 세션 저장
         return done(null, user);
       } catch (error) {
+        console.error('Error during Kakao login:', error);
         return done(error);
       }
     }

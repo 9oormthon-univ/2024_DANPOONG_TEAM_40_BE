@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>닉네임 수정</title>
+  <link rel="stylesheet" href="/profile.css">
+</head>
+<body>
+  <div class="edit-nickname-container">
+    <h2>닉네임 수정</h2>
+    <form action="/auth/edit-nickname" method="POST">
+      <input type="text" name="nickname" value="<%= nickname %>" required>
+      <button type="submit">저장</button>
+    </form>
+  </div>
+</body>
+</html>

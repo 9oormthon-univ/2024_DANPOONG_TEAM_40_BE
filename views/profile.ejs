@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로필 설정</title>
+  <link rel="stylesheet" href="/profile.css">
+</head>
+<body>
+  <div class="profile-container">
+    <header>
+      <a href="/" class="back-button">←</a>
+      <h1>프로필</h1>
+    </header>
+
+    <div class="profile-picture-section">
+      <img
+        src="<%= user.profileImage || '/default-avatar.png' %>"
+        alt="프로필 사진"
+        class="profile-picture"
+      />
+      <button class="change-picture-button" onclick="document.getElementById('profileImageInput').click()">프로필 사진 변경</button>
+      <form action="/auth/update-profile-picture" method="POST" enctype="multipart/form-data" id="profileImageForm">
+        <input
+          type="file"
+          name="profileImage"
+          id="profileImageInput"
+          accept="image/*"
+          style="display: none;"
+          onchange="document.getElementById('profileImageForm').submit()"
+        />
+      </form>
+    </div>
+
+    <div class="info-section">
+      <div class="info-item">
+        <label>닉네임</label>
+        <span id="nickname-display"><%= user.displayName %></span>
+        <button class="edit-link" onclick="openModal()">수정</button>
+      </div>
+      <div class="info-item">
+        <label>이메일</label>
+        <span><%= user.email || '카카오 이메일 미동기화' %></span>
+      </div>
+    </div>
+
+    <div class="logout-section">
+      <a href="/logout" class="logout-button">로그아웃</a>
+      <a href="/auth/delete-account" class="delete-account">계정 삭제</a>
+    </div>
+  </div>
+
+  <!-- 닉네임 변경 모달 -->
+  <div id="nickname-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal()">&times;</span>
+      <h2>닉네임 변경</h2>
+      <form id="nicknameForm" action="/auth/edit-nickname" method="POST">
+        <input type="text" name="nickname" id="nickname-input" placeholder="새 닉네임을 입력하세요" required />
+        <button type="submit" class="save-button">저장</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 모달 열기
+    function openModal() {
+      document.getElementById('nickname-modal').style.display = 'block';
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('nickname-modal').style.display = 'none';
+    }
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function (event) {
+      const modal = document.getElementById('nickname-modal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    };
+  </script>
+</body>
+</html>

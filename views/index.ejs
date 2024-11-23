@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kakao Login</title>
+</head>
+<body>
+  <% if (user) { %>
+    <h1>환영합니다, <%= user.displayName %> 님!</h1>
+    <a href="/logout"><button>로그아웃</button></a>
+    <a href="/profile"><button>프로필 설정</button></a>
+  <% } else { %>
+    <h1>로그인 해주세요</h1>
+    <a href="/auth/kakao"><button>카카오 로그인</button></a>
+    <a href="/guest"><button>게스트로 이용하기</button></a>
+  <% } %>
+</body>
+</html>

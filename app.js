@@ -11,10 +11,6 @@ require('dotenv').config();
 const authRouter = require('./src/routes/auth-route');
 const routeRouter = require('./src/routes/route-route');
 const placeRouter = require('./src/routes/place-route');
-const reviewRouter = require('./src/routes/review-route');
-const recommendRouter = require('./src/routes/recommend-route');
-const aroundRouter = require('./src/routes/around-route');
-const listRouter = require('./src/routes/list-route');
 const connect = require('./src/models');
 const { healthRoute } = require('./src/routes/health-route');
 const ttsRoute = require('./src/routes/tts-route');
@@ -44,8 +40,10 @@ if (process.env.NODE_ENV === 'production') {
 // CORS 설정
 app.use(cors());
 
-// 정적 파일 서빙
+// 정적 파일 제공 설정
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // JSON 및 URL 인코딩된 데이터 파싱
 app.use(express.json());
@@ -73,16 +71,16 @@ app.use('/auth', authRouter);
 app.use('/', authRouter);
 app.use('/places', placeRouter);
 app.use('/route', routeRouter);
-app.use('/review', reviewRouter);
-app.use('/recommend', recommendRouter);
-app.use('/around', aroundRouter);
-app.use('/list', listRouter);
 app.get('/session', (req, res) => {
   console.log('세션 데이터:', req.session);
   res.send(req.session);
 });
 
+
 app.use('/health', healthRoute);
+
+app.use('/tts', ttsRoute);
+console.log('GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 // 기본 상태 코드 및 응답 메시지
 const HTTP_STATUS = {
@@ -91,12 +89,14 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-app.get('/', (req, res) => {
-  res.status(HTTP_STATUS.SUCCESS).json({
-    status: 'success',
-    message: '루트 페이지!',
-  });
-});
+// app.get('/', (req, res) => {
+//   res.status(HTTP_STATUS.SUCCESS).json({
+//     status: 'success',
+//     message: '루트 페이지!',
+//   });
+// });
+
+
 
 // 404 에러 핸들링
 app.use((req, res, next) => {

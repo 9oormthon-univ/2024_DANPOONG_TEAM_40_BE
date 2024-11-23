@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <link rel="stylesheet" href="/signup.css">
+</head>
+<body>
+  <div class="container">
+    <h2>반가워요!<br>프로필을 설정해주세요.</h2>
+    
+    <!-- 프로필 이미지 업로드 -->
+    <form action="/auth/set-profile" method="POST" enctype="multipart/form-data">
+      <div class="profile-pic-placeholder" onclick="document.getElementById('profileImageInput').click()">
+        <img id="profileImagePreview" src="" alt="프로필 이미지" style="display: none;">
+      </div>
+      <input type="file" name="profileImage" id="profileImageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
+      
+      <input type="text" name="nickname" placeholder="닉네임을 입력해주세요." class="nickname-input" required>
+      <button type="submit" class="next-button">다음으로</button>
+    </form>
+  </div>
+
+  <!-- JavaScript 코드 추가 -->
+  <script>
+    function previewImage(event) {
+      const input = event.target;
+      const preview = document.getElementById('profileImagePreview');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          preview.style.objectFit = 'cover';  // 이미지가 원형에 맞게 커버되도록 설정
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+  </script>
+</body>
+</html>
