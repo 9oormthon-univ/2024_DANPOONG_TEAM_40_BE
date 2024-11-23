@@ -122,7 +122,7 @@ exports.navigateRoute2 = async (req, res) => {
       const currentLeg = navigateData.routeDetails.legs[i];
       const nextLeg = navigateData.routeDetails.legs[i + 1];
 
-      // 환승 정보 추가 (subway -> walk -> subway)
+      // 1. 환승 정보 추가 (subway -> walk -> subway)
       if (
         currentLeg.mode === 'SUBWAY' &&
         nextLeg?.mode === 'WALK' &&
@@ -135,29 +135,42 @@ exports.navigateRoute2 = async (req, res) => {
           navigateData.routeDetails.legs[i + 2].type
         );
 
-        currentLeg.transferInfo = transferInfo?.body || [];
-
-        // 환승 정보 추가
-        transferInfo?.body.forEach((transferStep) =>
-          allDescriptions.push(transferStep.mvContDtl)
-        );
+        if (transferInfo?.body?.length > 0) {
+          // mvPathMgNo === 1 필터링
+          const filteredTransferInfo = transferInfo.body.filter(
+            (item) => item.mvPathMgNo === 1
+          );
+          if (filteredTransferInfo.length > 0) {
+            currentLeg.transferInfo = filteredTransferInfo;
+            filteredTransferInfo.forEach((info) =>
+              allDescriptions.push(info.mvContDtl)
+            );
+            continue; // 환승 정보가 있다면 내부 정보는 추가하지 않음
+          }
+        }
       }
 
-      // 역사 내부 정보 추가 (subway 시작/종료 시)
-      if (currentLeg.mode === 'SUBWAY') {
+      // 2. 역사 내부 정보 추가 (subway 시작/종료 시, 환승 정보가 없을 경우)
+      if (currentLeg.mode === 'SUBWAY' && !currentLeg.transferInfo) {
         const internalInfo = await routeService.fetchStationInternalDetails(
           currentLeg.start.name,
           currentLeg.type
         );
-        currentLeg.internalInfo = internalInfo?.body || [];
-
-        // 역사 정보 추가
-        internalInfo?.body.forEach((internalStep) =>
-          allDescriptions.push(internalStep.mvContDtl)
-        );
+        if (internalInfo?.body.length > 0) {
+          // mvPathMgNo === 1 필터링
+          const filteredInternalInfo = internalInfo.body.filter(
+            (item) => item.mvPathMgNo === 1
+          );
+          if (filteredInternalInfo.length > 0) {
+            currentLeg.internalInfo = filteredInternalInfo[0]; // 첫 번째 내부 정보만 사용
+            filteredInternalInfo.forEach((info) =>
+              allDescriptions.push(info.mvContDtl)
+            );
+          }
+        }
       }
 
-      // Leg의 설명 추가
+      // 3. Leg의 기본 설명 추가
       currentLeg.description?.forEach((descStep) =>
         allDescriptions.push(descStep.description)
       );

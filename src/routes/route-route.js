@@ -9,6 +9,6 @@ console.log('컨트롤러 확인:', routeController);
 router.post('/transit', routeController.findTransitRoute);
 
 // 경로 안내 API
-router.post('/detail', routeController.navigateRoute);
+router.post('/detail', routeController.navigateRoute2);
 
 module.exports = router;
