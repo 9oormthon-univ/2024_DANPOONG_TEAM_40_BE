@@ -24,8 +24,16 @@ exports.generateAudio = async (text) => {
     };
 
     const [response] = await client.synthesizeSpeech(request);
-    const filePath = path.join(__dirname, '../uploads', `audio_${Date.now()}.mp3`);
-    await util.promisify(fs.writeFile)(filePath, response.audioContent, 'binary');
+    const filePath = path.join(
+      __dirname,
+      '../uploads/audio',
+      `audio_${Date.now()}.mp3`
+    );
+    await util.promisify(fs.writeFile)(
+      filePath,
+      response.audioContent,
+      'binary'
+    );
 
     return filePath;
   } catch (err) {

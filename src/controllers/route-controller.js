@@ -210,6 +210,18 @@ exports.navigateRoute2 = async (req, res) => {
       }
     }
 
+    // TTS 생성 및 MP3 파일 경로 추가
+    for (const desc of descriptions) {
+      try {
+        const audioPath = await ttsService.generateAudio(desc.description);
+        desc.audioFile = audioPath; // MP3 파일 경로 추가
+        console.log('성공!');
+      } catch (err) {
+        console.error('TTS 생성 실패:', err.message);
+        desc.audioFile = null; // TTS 생성 실패 시 null 처리
+      }
+    }
+
     return res.status(StatusCodes.OK).json({
       message: '경로 안내 시작!',
       data: {

@@ -111,7 +111,7 @@ exports.getSpecifiedPlace = async (pid) => {
         .replace(/\[영업시간\]/g, '') // [영업시간] 제거
         .replace(/;/g, ' ');
     }
-
+    console.log(poiInfo);
     return {
       id: poiInfo.id,
       name: poiInfo.name,
@@ -122,6 +122,7 @@ exports.getSpecifiedPlace = async (pid) => {
       lat: poiInfo.lat,
       lon: poiInfo.lon,
       time: processedTime,
+      tel: poiInfo.tel,
     };
   } catch (err) {
     console.error('장소 상세 검색 중 서버 오류', err);
